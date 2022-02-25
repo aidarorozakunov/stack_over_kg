@@ -1,12 +1,15 @@
-from rest_framework import status, generics
+from rest_framework import status, generics, viewsets
 from rest_framework.decorators import api_view
 from django.shortcuts import render
+from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from applications.question.models import Category
-from applications.question.serializers import CategorySerializer
+from applications.question.models import Category, Question, Answer
+from applications.question.permissions import IsQuestionAuthor
+from applications.question.serializers import CategorySerializer, QuestionSerializer, AnswerSerializer
+
 
 # 1 способ
 # @api_viw(['GET'])
@@ -23,9 +26,45 @@ from applications.question.serializers import CategorySerializer
 #         serializer = CategorySerializer(categories, many=True)
 #         return Response(serializer.data, status=status.HTTP_200_OK)
 
-# 3 способ
+# 3 CategoryListView
+
 class CategoryListView(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+
+# Question create view
+class QuestionListView(generics.ListAPIView):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+
+
+class QuestionCreateView(generics.CreateAPIView):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+    permission_classes = [IsAuthenticated, ] # запрет на редакцию
+
+    def get_serializer_context(self):
+        return {'request': self.request}
+
+
+class QuestionUpdateView(generics.UpdateAPIView):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+    permission_classes = [IsAuthenticated, IsQuestionAuthor, ]
+
+
+class QuestionDeleteView(generics.DestroyAPIView):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+    permission_classes = [IsAuthenticated, IsQuestionAuthor, ]
+
+
+# CRUD for answers
+class AnswerViewSet(viewsets.ModelViewSet):
+    queryset = Answer.objects.all()
+    serializer_class = AnswerSerializer
+    permission_classes = [IsAuthenticated, ]
+
 
 
