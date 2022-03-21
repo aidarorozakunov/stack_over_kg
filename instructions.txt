@@ -1,0 +1,15 @@
+redis configs:
+
+sudo apt install redis-server установка редис сервера
+sudo nano /etc/redis/redic.conf  ищем supervised no. Mеняем supervised systemd
+sudo systemctl restart redis.service(stop, start) рестарт редис сервера
+sudo systemctl status redis статус редиса
+
+
+celery configs:
+pip3 install Celery
+add configs to project settings(for redis)
+add celery.pu file
+@app.task -> func
+func(*args, **kwargs) -> func.delay(*args, **kwargs)
+celery -A project_name(название своего проекта) -l info запуск CELERY
